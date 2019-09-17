@@ -18,7 +18,7 @@
     delete from user_info
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.nekosighed.miaosha.pojo.UserInfoDO">
+  <insert id="insert" parameterType="com.nekosighed.miaosha.pojo.UserInfoDO" keyProperty="id" useGeneratedKeys="true">
     <!--
     -->
     insert into user_info (id, `name`, gender, 
@@ -57,5 +57,10 @@
   <select id="getUserInfoById" resultMap="BaseResultMap" parameterType="Integer">
     select * from user_info
     where user_id = #{id}
+  </select>
+
+  <select id="getUserInfoByTelphone" resultType="com.nekosighed.miaosha.pojo.UserInfoDO">
+    select * from user_info
+    where telphone = #{telphone}
   </select>
 </mapper>

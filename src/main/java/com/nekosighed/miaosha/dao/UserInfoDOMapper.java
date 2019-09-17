@@ -43,8 +43,15 @@ public interface UserInfoDOMapper {
     int updateByPrimaryKey(UserInfoDO record);
 
     /**
-     * 根据 id 获得 用户id
+     * 根据 id 获得 用户信息
      * @param id
      */
     UserInfoDO getUserInfoById(@Param("id")Integer id);
+
+    /**
+     * 通过手机号获得用户信息
+     * @param telphone
+     * @return
+     */
+    UserInfoDO getUserInfoByTelphone(String telphone);
 }
