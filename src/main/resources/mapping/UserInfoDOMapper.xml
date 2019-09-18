@@ -28,6 +28,58 @@
       #{age,jdbcType=INTEGER}, #{telphone,jdbcType=VARCHAR}, #{registerMode,jdbcType=VARCHAR}, 
       #{thirdPartyId,jdbcType=VARCHAR})
   </insert>
+  <insert id="insertSelective" parameterType="com.nekosighed.miaosha.pojo.UserInfoDO" keyProperty="id" useGeneratedKeys="true">
+    <!--
+    -->
+    insert into user_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        `name`,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+      <if test="telphone != null">
+        telphone,
+      </if>
+      <if test="registerMode != null">
+        register_mode,
+      </if>
+      <if test="thirdPartyId != null">
+        third_party_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=BIT},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="telphone != null">
+        #{telphone,jdbcType=VARCHAR},
+      </if>
+      <if test="registerMode != null">
+        #{registerMode,jdbcType=VARCHAR},
+      </if>
+      <if test="thirdPartyId != null">
+        #{thirdPartyId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
   <update id="updateByPrimaryKey" parameterType="com.nekosighed.miaosha.pojo.UserInfoDO">
     <!--
     -->

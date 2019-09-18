@@ -7,7 +7,8 @@ mybatis:
 
 spring:
   datasource:
-    url: jdbc:mysql://119.23.28.95:3306/miaosha?useSSL=false
+    # 避免乱码
+    url: jdbc:mysql://119.23.28.95:3306/miaosha?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowMultiQueries=true
     # 数据库名称
     name: miaosha
     username: root

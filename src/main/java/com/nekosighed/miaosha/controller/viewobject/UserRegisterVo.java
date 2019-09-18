@@ -15,7 +15,7 @@ import java.io.Serializable;
 @ToString
 public class UserRegisterVo  implements Serializable {
     /**
-     * 性别
+     * 性名
      */
     @NotBlank(message = "姓名不能为空")
     private String name;

@@ -8,6 +8,8 @@ import com.nekosighed.miaosha.pojo.UserInfoDO;
 import com.nekosighed.miaosha.pojo.UserPasswordDO;
 import com.nekosighed.miaosha.service.UserInfoService;
 import com.nekosighed.miaosha.service.model.UserInfoModel;
+import com.nekosighed.miaosha.service.model.UserPasswordModel;
+import com.nekosighed.miaosha.utils.FillDataUtils;
 import com.nekosighed.miaosha.utils.Md5Utils;
 import com.nekosighed.miaosha.validation.ValidationResult;
 import com.nekosighed.miaosha.validation.ValidatorImpl;
@@ -29,39 +31,43 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoDOMapper userInfoDOMapper;
 
     @Resource
-    private UserPasswordDOMapper userPasswordDOMapper;
+    private UserPasswordServiceImpl userPasswordService;
 
     @Resource
     private ValidatorImpl validator;
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
     public UserInfoModel getUserInfoById(Integer id) {
         UserInfoDO userInfoDO = userInfoDOMapper.selectByPrimaryKey(id);
-        UserPasswordDO userPasswordDO = userPasswordDOMapper.getUserPasswordByUserId(id);
+        UserPasswordModel userPasswordModel = userPasswordService.getUserPasswordByUserId(id);
+        UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userPasswordModel, UserPasswordDO.class);
         return FillData.fillDoToModel(userInfoDO, userPasswordDO);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void register(UserInfoModel userInfoModel) {
         ValidationResult result = validator.validate(userInfoModel);
         if (result.isHaveErrors()) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, result.getErrorsMsg());
         }
-        UserInfoDO userInfoDO = FillData.fillModelToDo(userInfoModel, UserInfoDO.class);
-        UserPasswordDO userPasswordDO = FillData.fillModelToDo(userInfoModel, UserPasswordDO.class);
+        UserInfoDO userInfoDO = FillDataUtils.fillModelToDo(userInfoModel, UserInfoDO.class);
+        UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userInfoModel, UserPasswordDO.class);
         try {
-            userInfoDOMapper.insert(userInfoDO);
+            userInfoDOMapper.insertSelective(userInfoDO);
         } catch (DuplicateKeyException e) {
             System.out.println("遇到唯一索引而导致创建失败");
             throw new BusinessException(BusinessErrorEnum.USER_ALREADY_EXIST);
         }
         // 设置 userId
         userPasswordDO.setUserId(userInfoDO.getId());
-        userPasswordDOMapper.insert(userPasswordDO);
+        UserPasswordModel userPasswordModel = FillDataUtils.fillDoToModel(userPasswordDO, UserPasswordModel.class);
+        userPasswordService.saveUserPassword(userPasswordModel);
     }
 
     @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
     public UserInfoModel validateLogin(String telphone, String encrptPassword) {
         if (StringUtils.isEmpty(telphone) || StringUtils.isEmpty(encrptPassword)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "手机号或密码不能为空");
@@ -72,7 +78,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new BusinessException(BusinessErrorEnum.USER_NOT_EXIST);
         }
         // 通过用户信息的id拿到密码
-        UserPasswordDO userPasswordDO = userPasswordDOMapper.getUserPasswordByUserId(userInfoDO.getId());
+        UserPasswordModel userPasswordModel = userPasswordService.getUserPasswordByUserId(userInfoDO.getId());
+        UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userPasswordModel, UserPasswordDO.class);
         if (userPasswordDO == null) {
             throw new BusinessException(BusinessErrorEnum.USER_INFO_PASSWORD_NOT_MATCHING);
         }
@@ -108,26 +115,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfoModel.setEncrptPassword(userPasswordDO.getEncrptPassword());
             }
             return userInfoModel;
-        }
-
-        /**
-         * 将 UserInfoModel 的属性映射到 DO
-         *
-         * @param userInfoModel
-         * @param clz
-         * @param <T>
-         * @return
-         */
-        private static <T> T fillModelToDo(UserInfoModel userInfoModel, Class<T> clz) {
-            T t;
-            try {
-                t = clz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                return null;
-            }
-            BeanUtils.copyProperties(userInfoModel, t);
-            return t;
         }
     }
 }

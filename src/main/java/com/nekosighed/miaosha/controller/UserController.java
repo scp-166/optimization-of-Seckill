@@ -9,6 +9,7 @@ import com.nekosighed.miaosha.response.CommonReturnType;
 import com.nekosighed.miaosha.service.impl.UserInfoServiceImpl;
 import com.nekosighed.miaosha.service.impl.UserPasswordServiceImpl;
 import com.nekosighed.miaosha.service.model.UserInfoModel;
+import com.nekosighed.miaosha.utils.FillDataUtils;
 import com.nekosighed.miaosha.utils.Md5Utils;
 import com.nekosighed.miaosha.utils.RedisUtils;
 import com.nekosighed.miaosha.validation.ValidationResult;
@@ -27,6 +28,7 @@ import java.util.Random;
 
 @RestController
 @RequestMapping("/")
+@CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 public class UserController extends BaseController {
     @Resource
     private UserInfoServiceImpl userInfoService;
@@ -45,6 +47,7 @@ public class UserController extends BaseController {
 
     @PostMapping("/getOpt")
     public CommonReturnType getOpt(@RequestParam(value = "telphone", required = false) String telphone) {
+        System.out.println(telphone);
         if (StringUtils.isEmpty(telphone)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "手机号不能为空");
         }
@@ -63,6 +66,7 @@ public class UserController extends BaseController {
 
     @PostMapping("/register")
     public CommonReturnType register(UserRegisterVo userRegisterVo) {
+        System.out.println(userRegisterVo);
         // 参数校验
         ValidationResult result = validator.validate(userRegisterVo);
         if (result.isHaveErrors()) {
@@ -91,6 +95,8 @@ public class UserController extends BaseController {
     @PostMapping("/login")
     public CommonReturnType login(@RequestParam(value = "telphone", required = false) String telphone,
                                   @RequestParam(value = "password", required = false) String password) {
+        System.out.println(telphone);
+        System.out.println(password);
         if (StringUtils.isEmpty(telphone) || StringUtils.isEmpty(password)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "手机号或密码不能为空");
         }
@@ -108,7 +114,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/user")
     public CommonReturnType getUserInfo(@RequestParam("id") Integer id) throws Exception {
-        UserInfoVO userInfoVO = fillModelTOVo(userInfoService.getUserInfoById(id));
+        UserInfoVO userInfoVO = FillDataUtils.fillModelToVo(userInfoService.getUserInfoById(id), UserInfoVO.class);
         if (userInfoVO == null) {
             // 会抛出对应异常错误信息
             // throw new BusinessException(BusinessErrorEnum.USER_NOT_EXIST);
@@ -118,18 +124,5 @@ public class UserController extends BaseController {
         return CommonReturnType.success(userInfoVO);
     }
 
-    /**
-     * 将核心领域模型 转化为 viewObject
-     *
-     * @param userInfoModel
-     * @return
-     */
-    private UserInfoVO fillModelTOVo(UserInfoModel userInfoModel) {
-        if (userInfoModel == null) {
-            return null;
-        }
-        UserInfoVO userInfoVO = new UserInfoVO();
-        BeanUtils.copyProperties(userInfoModel, userInfoVO);
-        return userInfoVO;
-    }
+
 }

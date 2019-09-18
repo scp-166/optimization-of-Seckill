@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" href="../../static/css/common.css">
+    <script type="application/javascript" src="../../static/js/vue.js"></script>
+    <script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+    <script src="../../static/component/utils.js"></script>
+
+</head>
+<body>
+<div id="main">
+    <form action="" @submit.prevent="submit" class="submit-form">
+        <label for="name"><b>注册</b></label>
+        <input type="text" placeholder="请输入名称" class="form-input" v-model="registerData.name" id="name">
+        <input type="text" placeholder="请输入性别" class="form-input" v-model="registerData.gender">
+        <input type="text" placeholder="请输入年龄" class="form-input" v-model="registerData.age">
+        <input type="text" placeholder="请输入手机号" class="form-input" v-model="checkTelphone">
+        <input type="text" placeholder="请输入密码" class="form-input" v-model="registerData.password">
+        <input type="text" placeholder="请输入验证码" class="form-input" v-model="checkOptCode">
+        <!--        <div>{{registerData.optCode}}</div>-->
+        <button type="submit">注册</button>
+        <button type="button" @click="toLogin">点我登录</button>
+        <span :class="{showError: isShow, showNone:!isShow}">{{info}}</span>
+    </form>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: "#main",
+        data: {
+            isShow: false,
+            registerData: {
+                name: "",
+                gender: "",
+                age: "",
+                telphone: "",
+                password: "",
+                optCode: "",
+            },
+            info: ""
+
+        },
+        computed: {
+            checkTelphone: {
+                get() {
+                    return this.registerData.telphone;
+                },
+                set(value) {
+                    let reg = new RegExp(/^[0-9]+$/);
+                    if (!reg.test(value)) {
+                        this.info = "手机号不能有字母";
+                        this.isShow = true;
+                    } else {
+                        this.registerData.telphone = value;
+                        this.info = "";
+                        this.isShow = false;
+                    }
+                }
+            },
+            checkOptCode: {
+                get() {
+                    return this.registerData.optCode;
+                },
+                set(value) {
+                    console.log("et");
+                    let reg = new RegExp(/^[0-9]+$/);
+                    if (!reg.test(value)) {
+                        this.info = "短信验证码不能有字母";
+                        this.isShow = true;
+                        return true;
+                    } else {
+                        this.registerData.optCode = value;
+                        this.info = "";
+                        this.isShow = false;
+                    }
+                }
+            }
+        },
+        methods: {
+            submit: function () {
+                if (this.check(this.registerData) === false) {
+                    return;
+                }
+                this.send(this.registerData);
+            },
+            // 查询数据是否缺少
+            check: function (registerData) {
+                let info = "";
+                for (let key in registerData) {
+                    if (registerData[key] === null || registerData[key] === "") {
+                        info += "缺少" + key + " ";
+                    }
+                }
+                if (info !== "") {
+                    this.info = info;
+                    this.isShow = true;
+                    return false;
+                }
+
+            },
+            // 默认请求头部的 Content-Type: application/json，并且请求正文是一个 json 格式的字符串
+            send(formData) {
+                let that = this;
+                let instance = window.utils.getInstance();
+                instance({
+                    url: "http://127.0.0.1:8080/register",
+                    method: "post",
+                    data: formData,
+                    // 允许在向服务器发送请求前，修改请求数据，只能用在 put post patch
+                    // 数组返回 字符串 ArrayBuff Stream
+                    transformRequest: [function (data) {
+                        // Do whatever you want to transform the data
+                        let ret = '';
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        // 去除最后一位
+                        return ret.substr(0, ret.length - 1);
+                    }],
+                    // 使用凭证
+                    withCredentials: true
+                }).then(function (response) {
+                    let data = response.data;
+                    console.log(data);
+                    if (data.status === "success") {
+                        console.log("成功");
+                        alert("注册成功");
+                        that.info = "注册成功";
+                        that.isShow = false;
+                    }
+                    if (data.status === "fail") {
+                        that.info = data.data.errMsg;
+                        that.isShow = true;
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                })
+            },
+            toLogin(){
+                window.location.href = "/miaosha/templates/User/login.html";
+            }
+        }
+    })
+</script>
+</body>
+</html>

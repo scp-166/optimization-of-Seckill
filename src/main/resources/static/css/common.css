@@ -1,0 +1,36 @@
+#main {
+    width: 50%;
+    margin: auto;
+}
+
+.submit-form {
+    margin: auto;
+    width: 50%;
+    border: 1px solid darkgray;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-input {
+    margin-top: 30px;
+    height: 50px;
+}
+
+.showError {
+    background: aqua;
+    color: rebeccapurple;
+}
+
+.showNone {
+    background: white;
+}
+
+label {
+    text-align: center;
+}
+
+span {
+    text-align: center;
+}
+
+

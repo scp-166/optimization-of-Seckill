@@ -22,6 +22,13 @@ public interface UserInfoDOMapper {
     int insert(UserInfoDO record);
 
     /**
+     * @Description:
+     * @Author: chf
+     * @CreateDate: 2019-09-18 17:04:43
+     */
+    int insertSelective(UserInfoDO record);
+
+    /**
      * @Description: 
      * @Author: chf
      * @CreateDate: 2019-09-16 22:34:06

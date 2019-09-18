@@ -20,6 +20,13 @@ public interface UserPasswordDOMapper {
     int insert(UserPasswordDO record);
 
     /**
+     * @Description:
+     * @Author: chf
+     * @CreateDate: 2019-09-18 17:04:43
+     */
+    int insertSelective(UserPasswordDO record);
+
+    /**
      * @Description: 
      * @Author: chf
      * @CreateDate: 2019-09-16 22:34:06
