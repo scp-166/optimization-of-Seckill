@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情</title>
+    <link rel="stylesheet" href="../../static/css/common.css">
+    <script type="application/javascript" src="../../static/js/vue.js"></script>
+    <script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
+    <script src="../../static/component/utils.js"></script>
+
+</head>
+<body>
+<div id="main">
+    <div>
+        <table>
+            <thead>
+            <tr>
+                <th>商品名</th>
+                <th>商品图片</th>
+                <th>商品描述</th>
+                <th>商品库存</th>
+                <th>商品销量</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{itemObj.title}}</td>
+                <td><img :src="itemObj.imgUrl" alt="" style="width: 200px; height: 100px"></td>
+                <td>{{itemObj.description}}</td>
+                <td>{{itemObj.stock}}</td>
+                <td>{{itemObj.sales}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <span :class="{showError: isShow, showNone:!isShow}">{{info}}</span>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: "#main",
+        data: {
+            isShow: false,
+            info: "",
+            itemObj: {}
+
+
+        },
+        methods: {
+            submit: function () {
+                if (this.check(this.itemData) === false) {
+                    return;
+                }
+                this.send(this.itemData);
+            },
+            // 查询数据是否缺少
+            check: function (objData) {
+                let info = "";
+                for (let key in objData) {
+                    if (objData[key] === null || objData[key] === "") {
+                        info += "缺少" + key + " ";
+                    }
+                }
+                if (info !== "") {
+                    this.info = info;
+                    this.isShow = true;
+                    return false;
+                }
+
+            },
+            // 默认请求头部的 Content-Type: application/json，并且请求正文是一个 json 格式的字符串
+            send(itemId) {
+                let that = this;
+                let instance = window.utils.getInstance();
+                axios({
+                    url: "http://127.0.0.1:8080/item/get" + "?itemId=" + itemId,
+                    method: "get",
+                    // 使用凭证
+                    withCredentials: true
+                }).then(function (response) {
+                    let data = response.data;
+                    if (data.status === "success") {
+                        that.info = "获取商品信息成功";
+                        that.isShow = false;
+                        that.itemObj = data.data;
+                    }
+                    if (data.status === "fail") {
+                        that.info = data.data.errMsg;
+                        that.isShow = true;
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                })
+            },
+            // 获取参数字符串
+            getQueryString(keyName) {
+                var reg = new RegExp("(^|&)" + keyName + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]);
+                return null;
+            }
+        }
+    });
+    vm.send(vm.getQueryString("itemId"));
+
+</script>
+</body>
+</html>

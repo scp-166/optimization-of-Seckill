@@ -16,9 +16,9 @@
         <input type="text" placeholder="请输入名称" class="form-input" v-model="registerData.name" id="name">
         <input type="text" placeholder="请输入性别" class="form-input" v-model="registerData.gender">
         <input type="text" placeholder="请输入年龄" class="form-input" v-model="registerData.age">
-        <input type="text" placeholder="请输入手机号" class="form-input" v-model="checkTelphone">
+        <input type="text" placeholder="请输入手机号" class="form-input" v-model="registerData.telphone">
         <input type="text" placeholder="请输入密码" class="form-input" v-model="registerData.password">
-        <input type="text" placeholder="请输入验证码" class="form-input" v-model="checkOptCode">
+        <input type="text" placeholder="请输入验证码" class="form-input" v-model="registerData.optCode">
         <!--        <div>{{registerData.optCode}}</div>-->
         <button type="submit">注册</button>
         <button type="button" @click="toLogin">点我登录</button>
@@ -41,42 +41,6 @@
             },
             info: ""
 
-        },
-        computed: {
-            checkTelphone: {
-                get() {
-                    return this.registerData.telphone;
-                },
-                set(value) {
-                    let reg = new RegExp(/^[0-9]+$/);
-                    if (!reg.test(value)) {
-                        this.info = "手机号不能有字母";
-                        this.isShow = true;
-                    } else {
-                        this.registerData.telphone = value;
-                        this.info = "";
-                        this.isShow = false;
-                    }
-                }
-            },
-            checkOptCode: {
-                get() {
-                    return this.registerData.optCode;
-                },
-                set(value) {
-                    console.log("et");
-                    let reg = new RegExp(/^[0-9]+$/);
-                    if (!reg.test(value)) {
-                        this.info = "短信验证码不能有字母";
-                        this.isShow = true;
-                        return true;
-                    } else {
-                        this.registerData.optCode = value;
-                        this.info = "";
-                        this.isShow = false;
-                    }
-                }
-            }
         },
         methods: {
             submit: function () {

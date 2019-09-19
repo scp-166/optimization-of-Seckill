@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>注册</title>
+    <title>创建商品</title>
     <link rel="stylesheet" href="../../static/css/common.css">
     <script type="application/javascript" src="../../static/js/vue.js"></script>
     <script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
@@ -17,8 +17,8 @@
         <input type="text" placeholder="请输入商品价格" class="form-input" v-model="itemData.price">
         <input type="text" placeholder="请输入商品描述" class="form-input" v-model="itemData.description">
         <input type="text" placeholder="请输入商品图片地址" class="form-input" v-model="itemData.imgUrl">
-        <input type="text" placeholder="请输入商品库存" class="form-input" v-model="checkStock">
-        <!--        <div>{{registerData.optCode}}</div>-->
+        <input type="text" placeholder="请输入商品库存" class="form-input" v-model="itemData.stock">
+                <div>{{itemData.stock}}</div>
         <button type="submit">保存商品信息</button>
         <span :class="{showError: isShow, showNone:!isShow}">{{info}}</span>
     </form>
@@ -38,24 +38,6 @@
             },
             info: ""
 
-        },
-        computed: {
-            checkStock: {
-                get() {
-                    return this.itemData.stock;
-                },
-                set(value) {
-                    let reg = new RegExp(/^[0-9]+$/);
-                    if (!reg.test(value)) {
-                        this.info = "手机号不能有字母";
-                        this.isShow = true;
-                    } else {
-                        this.itemData.stock = value;
-                        this.info = "";
-                        this.isShow = false;
-                    }
-                }
-            },
         },
         methods: {
             submit: function () {
@@ -115,9 +97,6 @@
                 }).catch(function (error) {
                     console.log(error);
                 })
-            },
-            toLogin() {
-                window.location.href = "/miaosha/templates/User/login.html";
             }
         }
     })

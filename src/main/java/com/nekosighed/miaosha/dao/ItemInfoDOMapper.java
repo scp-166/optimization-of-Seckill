@@ -2,6 +2,8 @@ package com.nekosighed.miaosha.dao;
 
 import com.nekosighed.miaosha.pojo.ItemInfoDO;
 
+import java.util.List;
+
 public interface ItemInfoDOMapper {
     /**
      * @Description: 
@@ -44,4 +46,12 @@ public interface ItemInfoDOMapper {
      * @CreateDate: 2019-09-18 16:56:47
      */
     int updateByPrimaryKey(ItemInfoDO record);
+
+    /**
+     * 获得商品列表
+     *  销量倒序排序
+     *
+     * @return
+     */
+    List<ItemInfoDO> listItemInfo();
 }

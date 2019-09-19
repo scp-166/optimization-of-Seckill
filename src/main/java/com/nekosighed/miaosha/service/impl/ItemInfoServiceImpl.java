@@ -5,6 +5,7 @@ import com.nekosighed.miaosha.error.BusinessErrorEnum;
 import com.nekosighed.miaosha.error.BusinessException;
 import com.nekosighed.miaosha.pojo.ItemInfoDO;
 import com.nekosighed.miaosha.pojo.ItemStockDO;
+import com.nekosighed.miaosha.pojo.UserInfoDO;
 import com.nekosighed.miaosha.service.ItemInfoService;
 import com.nekosighed.miaosha.service.model.ItemInfoModel;
 import com.nekosighed.miaosha.service.model.ItemStockModel;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemInfoServiceImpl implements ItemInfoService {
@@ -65,7 +67,13 @@ public class ItemInfoServiceImpl implements ItemInfoService {
 
     @Override
     public List<ItemInfoModel> getItemInfoList() {
-        return Collections.emptyList();
+        List<ItemInfoDO> itemInfoDOList = itemInfoDoMapper.listItemInfo();
+        return itemInfoDOList.stream().map(itemInfoDO -> {
+            ItemStockModel itemStockModel = itemStockService.getItemStockByItemId(itemInfoDO.getId());
+            ItemStockDO itemStockDO = FillDataUtils.fillModelToDo(itemStockModel, ItemStockDO.class);
+            return FillData.fillBothDoToModel(itemInfoDO, itemStockDO);
+
+        }).collect(Collectors.toList());
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)

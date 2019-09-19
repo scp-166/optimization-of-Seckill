@@ -19,11 +19,22 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--
     -->
-    select 
+    select
     <include refid="Base_Column_List" />
     from item_info
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+<!--  销量倒序排序-->
+  <select id="listItemInfo" resultMap="BaseResultMap">
+    <!--
+    -->
+    select
+    <include refid="Base_Column_List" />
+    from item_info
+    order by sales DESC
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     <!--
     -->
@@ -33,10 +44,10 @@
   <insert id="insert" parameterType="com.nekosighed.miaosha.pojo.ItemInfoDO">
     <!--
     -->
-    insert into item_info (id, title, price, 
+    insert into item_info (id, title, price,
       description, sales, img_url
       )
-    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
+    values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL},
       #{description,jdbcType=VARCHAR}, #{sales,jdbcType=INTEGER}, #{imgUrl,jdbcType=VARCHAR}
       )
   </insert>
