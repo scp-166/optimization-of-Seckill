@@ -12,26 +12,30 @@
 <body>
 <div id="main">
     <div>
-        <table>
-            <thead>
-            <tr>
-                <th>商品名</th>
-                <th>商品图片</th>
-                <th>商品描述</th>
-                <th>商品库存</th>
-                <th>商品销量</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>{{itemObj.title}}</td>
-                <td><img :src="itemObj.imgUrl" alt="" style="width: 200px; height: 100px"></td>
-                <td>{{itemObj.description}}</td>
-                <td>{{itemObj.stock}}</td>
-                <td>{{itemObj.sales}}</td>
-            </tr>
-            </tbody>
-        </table>
+
+        <form action="" class="submit-form" @submit.prevent="miaosha">
+            <table style="width: 100%">
+                <thead>
+                <tr>
+                    <th>商品名</th>
+                    <th>商品图片</th>
+                    <th>商品描述</th>
+                    <th>商品库存</th>
+                    <th>商品销量</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{itemObj.title}}</td>
+                    <td><img :src="itemObj.imgUrl" alt="" style="width: 200px; height: 100px"></td>
+                    <td>{{itemObj.description}}</td>
+                    <td>{{itemObj.stock}}</td>
+                    <td>{{itemObj.sales}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <button type="submit">秒杀!!!!!!!!!!!</button>
+        </form>
     </div>
     <span :class="{showError: isShow, showNone:!isShow}">{{info}}</span>
 </div>
@@ -47,11 +51,16 @@
 
         },
         methods: {
-            submit: function () {
-                if (this.check(this.itemData) === false) {
-                    return;
+            miaosha: function () {
+                let that = this;
+                let id = that.itemObj.id;
+                if (id === "" || id === undefined || id === null) {
+                    that.isShow = true;
+                    that.info = "缺失id";
+                } else {
+                    // 默认抢一个
+                    that.updateOrder(that.itemObj.id, 1);
                 }
-                this.send(this.itemData);
             },
             // 查询数据是否缺少
             check: function (objData) {
@@ -92,6 +101,47 @@
                     console.log(error);
                 })
             },
+            updateOrder(itemId, itemAccount) {
+                let that = this;
+                let instance = window.utils.getInstance();
+                instance({
+                    url: "http://127.0.0.1:8080/order/newOne",
+                    method: "post",
+                    data:{
+                        itemId: itemId,
+                        itemAccount: itemAccount
+                    },
+                    // 数组返回 字符串 ArrayBuff Stream
+                    transformRequest: [function (data) {
+                        // Do whatever you want to transform the data
+                        let ret = '';
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        // 去除最后一位
+                        return ret.substr(0, ret.length - 1);
+                    }],
+                    // 使用凭证
+                    withCredentials: true
+                }).then(function (response) {
+                    console.log(response);
+                    let data = response.data;
+                    if (data.status === "success") {
+                        that.info = "秒杀成功";
+                        that.isShow = false;
+                        window.location.reload();
+                    }
+                    if (data.status === "fail") {
+                        that.info = data.data.errMsg;
+                        that.isShow = true;
+                        if (data.data.errCode === 20005){
+                            window.location.href = "http://localhost:63342/miaosha/templates/User/login.html"
+                        }
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                })
+            },
             // 获取参数字符串
             getQueryString(keyName) {
                 var reg = new RegExp("(^|&)" + keyName + "=([^&]*)(&|$)");
@@ -101,7 +151,10 @@
             }
         }
     });
-    vm.send(vm.getQueryString("itemId"));
+    let itemId = vm.getQueryString("itemId");
+    if (itemId !== null && itemId !== '' && itemId !== undefined) {
+        vm.send(vm.getQueryString("itemId"));
+    }
 
 </script>
 </body>

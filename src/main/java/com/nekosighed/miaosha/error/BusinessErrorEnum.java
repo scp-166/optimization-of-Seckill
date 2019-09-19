@@ -13,16 +13,19 @@ public enum BusinessErrorEnum implements CommonError{
      */
     UNKNOWN_ERROR(10000, "未知错误"),
     PARAM_ERROR(10001, "通用参数错误"),
+    PARAM_VALIDATE_ERROR(10002, "参数校验错误"),
 
     USER_NOT_EXIST(20001, "用户不存在"),
     USER_ALREADY_EXIST(20002, "用户已存在"),
     LOGIN_FAIL(20003, "用户手机号或密码不正确"),
     OPT_AUTH_ERROR(20004, "短信验证失败"),
-    USER_INFO_PASSWORD_NOT_MATCHING(20005, "用户信息和密码不匹配"),
+    USER_NOT_LOGIN(20005, "用户未登陆"),
     SAVE_PASSWORD_ERROR(20006, "保存密码失败"),
 
     ITEM_SAVE_ERROR(30001, "商品保存失败"),
     ITEM_STOCK_SAVE_ERROR(30002, "商品库存保存失败"),
+    ITEM_STOCK_NOT_ENOUGH(30003, "商品库存不足"),
+    INC_ITEM_SALES_ERROR(30004, "增加商品销量失败"),
 
     FILL_DATA_NULL(90001, "fillData出现空")
     ;

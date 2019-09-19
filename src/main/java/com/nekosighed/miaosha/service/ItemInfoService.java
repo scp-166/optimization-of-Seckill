@@ -27,4 +27,12 @@ public interface ItemInfoService {
      * @return
      */
     ItemInfoModel getItemInfoById(Integer id);
+
+    /**
+     * 增加商品对应的销量
+     *
+     * @param id
+     * @param itemAccount
+     */
+    boolean incSalesByPrimaryId(Integer id, Integer itemAccount);
 }

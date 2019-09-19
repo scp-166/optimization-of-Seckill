@@ -114,6 +114,10 @@ public class UserController extends BaseController {
         }
         redisUtils.set("IS_LOGIN" + ":" + telphone, 1);
         redisUtils.set("LOGIN_USER" + ":" + telphone, userInfoModel);
+
+        httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
+        httpServletRequest.getSession().setAttribute("LOGIN_USER", userInfoModel);
+
         return CommonReturnType.success("登陆成功");
     }
 

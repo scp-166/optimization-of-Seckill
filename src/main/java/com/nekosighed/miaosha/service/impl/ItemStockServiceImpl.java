@@ -57,9 +57,16 @@ public class ItemStockServiceImpl implements ItemStockService {
     @Override
     public ItemStockModel getItemStockByPrimaryId(Integer id) {
         ItemStockDO itemStockDO = itemStockDOMapper.selectByPrimaryKey(id);
-        if (Objects.isNull(itemStockDO)){
+        if (Objects.isNull(itemStockDO)) {
             return null;
         }
         return FillDataUtils.fillDoToModel(itemStockDO, ItemStockModel.class);
+    }
+
+    @Override
+    public boolean decStockAccount(Integer itemId, Integer itemAccount) {
+        int affectRow = itemStockDOMapper.decStockAccount(itemId, itemAccount);
+        // 成功执行返回 true
+        return affectRow > 0;
     }
 }

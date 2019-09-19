@@ -75,6 +75,7 @@
                     if (data.status === "success") {
                         that.info = "登陆成功";
                         that.isShow = false;
+                        window.location.href = "http://localhost:63342/miaosha/templates/Item/itemList.html"
                     }
                     if (data.status === "fail") {
                         that.info = data.data.errMsg;

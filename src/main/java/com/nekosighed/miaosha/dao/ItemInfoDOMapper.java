@@ -1,6 +1,7 @@
 package com.nekosighed.miaosha.dao;
 
 import com.nekosighed.miaosha.pojo.ItemInfoDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -54,4 +55,13 @@ public interface ItemInfoDOMapper {
      * @return
      */
     List<ItemInfoDO> listItemInfo();
+
+    /**
+     * 增加商品对应销量
+     *
+     * @param id
+     * @param itemAccount
+     * @return
+     */
+    int incSalesByPrimaryId(@Param("itemId") Integer id, @Param("itemAccount") Integer itemAccount);
 }

@@ -85,7 +85,13 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="getItemStockByItemId" resultType="com.nekosighed.miaosha.pojo.ItemStockDO">
+  <update id="decStockAccount">
+    update item_stock
+    set stock = stock - #{itemAccount}
+    where item_id = #{itemId} and stock >= #{itemAccount}
+  </update>
+
+    <select id="getItemStockByItemId" resultType="com.nekosighed.miaosha.pojo.ItemStockDO">
     select * from item_stock
     where item_id = #{itemId}
   </select>

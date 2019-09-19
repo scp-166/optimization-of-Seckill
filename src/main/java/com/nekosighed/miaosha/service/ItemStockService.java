@@ -27,4 +27,13 @@ public interface ItemStockService {
      * @return
      */
     ItemStockModel getItemStockByPrimaryId(Integer id);
+
+    /**
+     * 库存扣减
+     *
+     * @param itemId
+     * @param itemAccount
+     * @return
+     */
+    boolean decStockAccount(Integer itemId, Integer itemAccount);
 }

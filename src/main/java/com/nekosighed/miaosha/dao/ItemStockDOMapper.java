@@ -53,4 +53,12 @@ public interface ItemStockDOMapper {
      * @return
      */
     ItemStockDO getItemStockByItemId(@Param("itemId") Integer itemId);
+
+    /**
+     * 减少对应产品的库存
+     * @param itemId
+     * @param itemAccount
+     * @return
+     */
+     int decStockAccount(@Param("itemId") Integer itemId, @Param("itemAccount") Integer itemAccount);
 }

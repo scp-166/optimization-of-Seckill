@@ -89,6 +89,11 @@ public class ItemInfoServiceImpl implements ItemInfoService {
         return FillData.fillBothDoToModel(itemInfoDO, itemStockDO);
     }
 
+    @Override
+    public boolean incSalesByPrimaryId(Integer id, Integer itemAccount) {
+        return itemInfoDoMapper.incSalesByPrimaryId(id, itemAccount) > 0;
+    }
+
     private static class FillData {
         /**
          * 合并两个 DO，部分查询
