@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 @Service
 public class UserPasswordServiceImpl implements UserPasswordService {
@@ -29,9 +30,9 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public int saveUserPassword(UserPasswordModel userPasswordModel) {
         UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userPasswordModel, UserPasswordDO.class);
-        if (userPasswordDO != null) {
+        if (Objects.nonNull(userPasswordDO)) {
             int saveStatus = userPasswordDOMapper.insertSelective(userPasswordDO);
-            if (saveStatus <= 0){
+            if (saveStatus <= 0) {
                 throw new BusinessException(BusinessErrorEnum.SAVE_PASSWORD_ERROR);
             }
         }

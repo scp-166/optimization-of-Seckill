@@ -22,7 +22,9 @@ public enum BusinessErrorEnum implements CommonError{
     SAVE_PASSWORD_ERROR(20006, "保存密码失败"),
 
     ITEM_SAVE_ERROR(30001, "商品保存失败"),
-    ITEM_STOCK_SAVE_ERROR(30002, "商品库存保存失败")
+    ITEM_STOCK_SAVE_ERROR(30002, "商品库存保存失败"),
+
+    FILL_DATA_NULL(90001, "fillData出现空")
     ;
     private int code;
     private String msg;

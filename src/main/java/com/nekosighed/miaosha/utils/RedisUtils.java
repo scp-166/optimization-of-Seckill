@@ -16,6 +16,12 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
     /**
+     * 避免工具类被创建
+     */
+    RedisUtils() {
+    }
+
+    /**
      * 注入redisTemplate bean
      */
     @Resource

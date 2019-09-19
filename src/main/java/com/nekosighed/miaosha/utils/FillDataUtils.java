@@ -2,7 +2,14 @@ package com.nekosighed.miaosha.utils;
 
 import org.springframework.beans.BeanUtils;
 
+import java.util.Objects;
+
 public class FillDataUtils {
+    /**
+     * 避免工具类被创建
+     */
+    FillDataUtils(){}
+
     /**
      * 将 module 的属性映射生成一个 DO
      *
@@ -13,7 +20,7 @@ public class FillDataUtils {
      * @return
      */
     public static <M, D> D fillModelToDo(M model, Class<D> DOClz) {
-        if (model == null) {
+        if(Objects.isNull(model)){
             return null;
         }
         D doEntity;
@@ -37,7 +44,7 @@ public class FillDataUtils {
      * @return
      */
     public static <M, D> M fillDoToModel(D doEntity, Class<M> mClz) {
-        if (doEntity == null) {
+        if (Objects.isNull(doEntity)) {
             return null;
         }
         M model;
@@ -52,7 +59,7 @@ public class FillDataUtils {
     }
 
     public static <M, V> V fillModelToVo(M model, Class<V> vclz){
-        if (model == null){
+        if (Objects.isNull(model)){
             return null;
         }
         V viewObject;
@@ -77,7 +84,7 @@ public class FillDataUtils {
      * @return
      */
     public static <V, M> M fillVoToModel(V viewObject, Class<M> mclz) {
-        if (viewObject == null) {
+        if (Objects.isNull(viewObject)) {
             return null;
         }
         M model;

@@ -14,6 +14,8 @@ import com.nekosighed.miaosha.utils.Md5Utils;
 import com.nekosighed.miaosha.utils.RedisUtils;
 import com.nekosighed.miaosha.validation.ValidationResult;
 import com.nekosighed.miaosha.validation.ValidatorImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +32,8 @@ import java.util.Random;
 @RequestMapping("/")
 @CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 public class UserController extends BaseController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Resource
     private UserInfoServiceImpl userInfoService;
 
@@ -47,7 +51,6 @@ public class UserController extends BaseController {
 
     @PostMapping("/getOpt")
     public CommonReturnType getOpt(@RequestParam(value = "telphone", required = false) String telphone) {
-        System.out.println(telphone);
         if (StringUtils.isEmpty(telphone)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "手机号不能为空");
         }
@@ -61,12 +64,14 @@ public class UserController extends BaseController {
         // 2. 绑定用户手机号和 opt Code
         redisUtils.set(telphone, opt, 600);
 
+        logger.info("手机 {} 获得验证码 {}", telphone, opt);
+
         return CommonReturnType.success(opt);
     }
 
     @PostMapping("/register")
     public CommonReturnType register(UserRegisterVo userRegisterVo) {
-        System.out.println(userRegisterVo);
+        logger.info("注册的账号参数是: {}", userRegisterVo);
         // 参数校验
         ValidationResult result = validator.validate(userRegisterVo);
         if (result.isHaveErrors()) {
@@ -95,8 +100,8 @@ public class UserController extends BaseController {
     @PostMapping("/login")
     public CommonReturnType login(@RequestParam(value = "telphone", required = false) String telphone,
                                   @RequestParam(value = "password", required = false) String password) {
-        System.out.println(telphone);
-        System.out.println(password);
+        logger.info("登陆手机号和密码分别是: {}, {}", telphone, password);
+
         if (StringUtils.isEmpty(telphone) || StringUtils.isEmpty(password)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "手机号或密码不能为空");
         }

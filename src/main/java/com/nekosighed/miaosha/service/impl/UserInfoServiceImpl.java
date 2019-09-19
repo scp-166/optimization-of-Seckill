@@ -13,6 +13,8 @@ import com.nekosighed.miaosha.utils.FillDataUtils;
 import com.nekosighed.miaosha.utils.Md5Utils;
 import com.nekosighed.miaosha.validation.ValidationResult;
 import com.nekosighed.miaosha.validation.ValidatorImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -24,9 +26,12 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
+    private static final Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
+
     @Resource
     private UserInfoDOMapper userInfoDOMapper;
 
@@ -48,6 +53,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void register(UserInfoModel userInfoModel) {
+        if (Objects.isNull(userInfoModel)) {
+            throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "缺失用户信息参数");
+        }
         ValidationResult result = validator.validate(userInfoModel);
         if (result.isHaveErrors()) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, result.getErrorsMsg());
@@ -57,7 +65,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         try {
             userInfoDOMapper.insertSelective(userInfoDO);
         } catch (DuplicateKeyException e) {
-            System.out.println("遇到唯一索引而导致创建失败");
+            logger.warn("账号: {}遇到唯一索引而导致创建失败", userInfoModel.getTelphone());
             throw new BusinessException(BusinessErrorEnum.USER_ALREADY_EXIST);
         }
         // 设置 userId
@@ -74,22 +82,25 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         // 通过 telphone 拿到用户信息
         UserInfoDO userInfoDO = userInfoDOMapper.getUserInfoByTelphone(telphone);
-        if (userInfoDO == null) {
+        if (Objects.isNull(userInfoDO)) {
             throw new BusinessException(BusinessErrorEnum.USER_NOT_EXIST);
         }
         // 通过用户信息的id拿到密码
         UserPasswordModel userPasswordModel = userPasswordService.getUserPasswordByUserId(userInfoDO.getId());
         UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userPasswordModel, UserPasswordDO.class);
-        if (userPasswordDO == null) {
-            throw new BusinessException(BusinessErrorEnum.USER_INFO_PASSWORD_NOT_MATCHING);
+        if (Objects.isNull(userPasswordDO)) {
+            throw new BusinessException(BusinessErrorEnum.FILL_DATA_NULL);
         }
+        // 组装返回值
         UserInfoModel userInfoModel = FillData.fillDoToModel(userInfoDO, userPasswordDO);
+        if (Objects.isNull(userInfoModel)){
+            throw new BusinessException(BusinessErrorEnum.FILL_DATA_NULL, "数据格式转换为空");
+        }
         // 通过用户信息的密码和传入来的密码进行匹配
-        if (!encrptPassword.equals(userInfoModel.getEncrptPassword())) {
+        if (!Objects.equals(encrptPassword, userInfoModel.getEncrptPassword())) {
             throw new BusinessException(BusinessErrorEnum.LOGIN_FAIL);
         }
         return userInfoModel;
-
     }
 
     /**
@@ -104,14 +115,14 @@ public class UserInfoServiceImpl implements UserInfoService {
          * @return 领域模型 UserInfoModel
          */
         private static UserInfoModel fillDoToModel(UserInfoDO userInfoDO, UserPasswordDO userPasswordDO) {
-            if (userInfoDO == null) {
+            if (Objects.isNull(userInfoDO)) {
                 return null;
             }
             UserInfoModel userInfoModel = new UserInfoModel();
 
             BeanUtils.copyProperties(userInfoDO, userInfoModel);
 
-            if (userPasswordDO != null) {
+            if (Objects.nonNull(userPasswordDO)) {
                 userInfoModel.setEncrptPassword(userPasswordDO.getEncrptPassword());
             }
             return userInfoModel;

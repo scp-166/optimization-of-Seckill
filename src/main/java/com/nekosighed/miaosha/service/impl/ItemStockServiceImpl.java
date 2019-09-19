@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 @Service
 public class ItemStockServiceImpl implements ItemStockService {
@@ -34,7 +35,7 @@ public class ItemStockServiceImpl implements ItemStockService {
     @Override
     public ItemStockModel saveItemStock(ItemStockModel itemStockModel) {
         // 校验参数
-        if (itemStockModel == null) {
+        if (Objects.isNull(itemStockModel)) {
             return null;
         }
         ValidationResult result = validator.validate(itemStockModel);
@@ -43,7 +44,7 @@ public class ItemStockServiceImpl implements ItemStockService {
         }
         // itemModel -> data object
         ItemStockDO itemStockDO = FillDataUtils.fillModelToDo(itemStockModel, ItemStockDO.class);
-        if (itemStockDO == null) {
+        if (Objects.isNull(itemStockDO)) {
             return null;
         }
         if (itemStockDOMapper.insertSelective(itemStockDO) <= 0) {
@@ -56,7 +57,7 @@ public class ItemStockServiceImpl implements ItemStockService {
     @Override
     public ItemStockModel getItemStockByPrimaryId(Integer id) {
         ItemStockDO itemStockDO = itemStockDOMapper.selectByPrimaryKey(id);
-        if (itemStockDO == null){
+        if (Objects.isNull(itemStockDO)){
             return null;
         }
         return FillDataUtils.fillDoToModel(itemStockDO, ItemStockModel.class);

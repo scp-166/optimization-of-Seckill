@@ -8,6 +8,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class Md5Utils {
     /**
+     * 避免工具类被创建
+     */
+    Md5Utils() {
+    }
+
+    /**
      * 将字符串进行md5加密
      *
      * @param str

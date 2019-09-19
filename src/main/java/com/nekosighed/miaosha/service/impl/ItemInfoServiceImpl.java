@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ItemInfoServiceImpl implements ItemInfoService {
@@ -34,7 +36,7 @@ public class ItemInfoServiceImpl implements ItemInfoService {
     @Override
     public ItemInfoModel saveItemInfo(ItemInfoModel itemInfoModel) {
         // 校验参数
-        if (itemInfoModel == null) {
+        if (Objects.isNull(itemInfoModel)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_ERROR, "缺失商品信息参数");
         }
         // 校验属性
@@ -45,7 +47,7 @@ public class ItemInfoServiceImpl implements ItemInfoService {
         // 转换 itemModel -> dataObject
         ItemInfoDO itemInfoDO = FillDataUtils.fillModelToDo(itemInfoModel, ItemInfoDO.class);
         // 写入数据库
-        if(itemInfoDoMapper.insertSelective(itemInfoDO) <= 0){
+        if (itemInfoDoMapper.insertSelective(itemInfoDO) <= 0) {
             throw new BusinessException(BusinessErrorEnum.ITEM_SAVE_ERROR);
         }
         itemInfoModel.setId(itemInfoDO.getId());
@@ -54,7 +56,7 @@ public class ItemInfoServiceImpl implements ItemInfoService {
         itemStockModel.setItemId(itemInfoModel.getId());
         itemStockModel.setStock(itemInfoModel.getStock());
 
-        if(itemStockService.saveItemStock(itemStockModel) == null) {
+        if (Objects.isNull(itemStockService.saveItemStock(itemStockModel))) {
             throw new BusinessException(BusinessErrorEnum.ITEM_STOCK_SAVE_ERROR);
         }
         // 返回创建完成的对象
@@ -63,14 +65,14 @@ public class ItemInfoServiceImpl implements ItemInfoService {
 
     @Override
     public List<ItemInfoModel> getItemInfoList() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public ItemInfoModel getItemInfoById(Integer id) {
         ItemInfoDO itemInfoDO = itemInfoDoMapper.selectByPrimaryKey(id);
-        if (itemInfoDO == null) {
+        if (Objects.isNull(itemInfoDO)) {
             return null;
         }
         // 获得库存信息
@@ -88,12 +90,12 @@ public class ItemInfoServiceImpl implements ItemInfoService {
          * @return
          */
         private static ItemInfoModel fillBothDoToModel(ItemInfoDO itemInfoDO, ItemStockDO itemStockDO) {
-            if (itemInfoDO == null) {
+            if (Objects.isNull(itemInfoDO)) {
                 return null;
             }
             ItemInfoModel itemInfoModel = new ItemInfoModel();
             BeanUtils.copyProperties(itemInfoDO, itemInfoModel);
-            if (itemStockDO != null) {
+            if (Objects.nonNull(itemStockDO)) {
                 itemInfoModel.setStock(itemStockDO.getStock());
             }
             return itemInfoModel;
