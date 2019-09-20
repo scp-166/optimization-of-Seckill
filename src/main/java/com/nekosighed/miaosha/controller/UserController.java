@@ -1,13 +1,12 @@
 package com.nekosighed.miaosha.controller;
 
 import com.nekosighed.miaosha.controller.viewobject.UserInfoVO;
-import com.nekosighed.miaosha.controller.viewobject.UserRegisterVo;
+import com.nekosighed.miaosha.controller.viewobject.UserRegisterVO;
 import com.nekosighed.miaosha.enumtype.RegisterModeEnum;
 import com.nekosighed.miaosha.error.BusinessErrorEnum;
 import com.nekosighed.miaosha.error.BusinessException;
 import com.nekosighed.miaosha.response.CommonReturnType;
 import com.nekosighed.miaosha.service.impl.UserInfoServiceImpl;
-import com.nekosighed.miaosha.service.impl.UserPasswordServiceImpl;
 import com.nekosighed.miaosha.service.model.UserInfoModel;
 import com.nekosighed.miaosha.utils.FillDataUtils;
 import com.nekosighed.miaosha.utils.Md5Utils;
@@ -18,12 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotBlank;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -70,7 +67,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/register")
-    public CommonReturnType register(UserRegisterVo userRegisterVo) {
+    public CommonReturnType register(UserRegisterVO userRegisterVo) {
         logger.info("注册的账号参数是: {}", userRegisterVo);
         // 参数校验
         ValidationResult result = validator.validate(userRegisterVo);

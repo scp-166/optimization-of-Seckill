@@ -8,8 +8,9 @@ public interface OrderInfoService {
      *
      * @param userId
      * @param itemId
+     * @param promoId
      * @param itemAmount
      * @return
      */
-    OrderInfoModel createOrder(Integer userId, Integer itemId, Integer itemAmount);
+    OrderInfoModel createOrder(Integer userId, Integer itemId, Integer promoId, Integer itemAmount);
 }

@@ -58,4 +58,25 @@ public class ItemInfoVO {
      */
     @NotNull(message = "库存不能不填")
     private Integer stock;
+
+    // ----------------- 活动字段 ----------------
+    /**
+     * 活动状态
+     */
+    private Integer promoStatus;
+
+    /**
+     * 活动id
+     */
+    private Integer promoId;
+
+    /**
+     * 活动价格
+     */
+    private BigDecimal promoPrice;
+
+    /**
+     * 活动开始时间
+     */
+    private String promoStartTime;
 }

@@ -58,4 +58,14 @@ public class ItemInfoModel {
      */
     @NotNull(message = "库存不能不填")
     private Integer stock;
+
+    /**
+     * 聚合进来的商品信息
+     */
+    private PromoInfoModel promoInfoModel;
+
+    /**
+     * 商品活动id(如果有
+     */
+    private Integer indPromoId;
 }

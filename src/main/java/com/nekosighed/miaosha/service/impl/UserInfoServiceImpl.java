@@ -89,11 +89,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserPasswordModel userPasswordModel = userPasswordService.getUserPasswordByUserId(userInfoDO.getId());
         UserPasswordDO userPasswordDO = FillDataUtils.fillModelToDo(userPasswordModel, UserPasswordDO.class);
         if (Objects.isNull(userPasswordDO)) {
-            throw new BusinessException(BusinessErrorEnum.FILL_DATA_NULL);
+            logger.warn("用户密码模型-》DO 转换失败");
+            throw new BusinessException(BusinessErrorEnum.FILL_DATA_NULL, "数据转换失败");
         }
         // 组装返回值
         UserInfoModel userInfoModel = FillData.fillDoToModel(userInfoDO, userPasswordDO);
         if (Objects.isNull(userInfoModel)){
+            logger.warn("用户信息组装失败");
             throw new BusinessException(BusinessErrorEnum.FILL_DATA_NULL, "数据格式转换为空");
         }
         // 通过用户信息的密码和传入来的密码进行匹配

@@ -5,6 +5,7 @@ import com.nekosighed.miaosha.response.CommonReturnType;
 import com.nekosighed.miaosha.service.impl.ItemInfoServiceImpl;
 import com.nekosighed.miaosha.service.model.ItemInfoModel;
 import com.nekosighed.miaosha.utils.FillDataUtils;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,6 +48,7 @@ public class ItemContorller extends BaseController {
     public CommonReturnType getItem(@RequestParam Integer itemId) {
         ItemInfoModel itemInfoModel = itemInfoService.getItemInfoById(itemId);
         ItemInfoVO itemInfoVO = FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
+        itemInfoVO = FillData.advanceData(itemInfoVO, itemInfoModel);
         return CommonReturnType.success(itemInfoVO);
     }
 
@@ -62,7 +65,33 @@ public class ItemContorller extends BaseController {
                     return FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
                 }).collect(Collectors.toList())
         );
+    }
 
-
+    private static class FillData {
+        /**
+         * 补充 ItemInfoVo 的活动信息
+         *
+         * @param itemInfoVO
+         * @param itemInfoModel
+         * @return
+         */
+        public static ItemInfoVO advanceData(ItemInfoVO itemInfoVO, ItemInfoModel itemInfoModel) {
+            // 设置
+            if (Objects.nonNull(itemInfoVO)) {
+                if (Objects.isNull(itemInfoModel.getPromoInfoModel())) {
+                    // 商品没有对应活动信息，设置为未开始(就是没有秒杀活动
+                    itemInfoVO.setPromoStatus(-1);
+                } else {
+                    itemInfoVO.setPromoStatus(itemInfoModel.getPromoInfoModel().getIndStatus());
+                    itemInfoVO.setPromoId(itemInfoModel.getPromoInfoModel().getId());
+                    itemInfoVO.setPromoPrice(itemInfoModel.getPromoInfoModel().getPromoPrice());
+                    // 将 joda-time 序列化指定字符串
+                    itemInfoVO.setPromoStartTime(itemInfoModel.getPromoInfoModel().getStartTime().toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+                }
+                return itemInfoVO;
+            } else {
+                return null;
+            }
+        }
     }
 }

@@ -24,13 +24,14 @@ public class OrderController extends BaseController {
 
     @PostMapping("/newOne")
     public CommonReturnType newOneOrder(@RequestParam("itemId") Integer itemId,
-                                        @RequestParam("itemAccount") Integer itemAccount) {
+                                        @RequestParam("itemAccount") Integer itemAccount,
+                                        @RequestParam(value = "promoId",required = false) Integer promoId) {
         Boolean isLogin = (Boolean) httpServletRequest.getSession().getAttribute("IS_LOGIN");
         if (Objects.isNull(isLogin)) {
             throw new BusinessException(BusinessErrorEnum.USER_NOT_LOGIN);
         }
         UserInfoModel userInfoModel = (UserInfoModel) httpServletRequest.getSession().getAttribute("LOGIN_USER");
-        orderInfoService.createOrder(userInfoModel.getId(), itemId, itemAccount);
+        orderInfoService.createOrder(userInfoModel.getId(), itemId, promoId, itemAccount);
         return CommonReturnType.success(null);
     }
 }

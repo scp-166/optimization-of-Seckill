@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserRegisterVo  implements Serializable {
+public class UserRegisterVO implements Serializable {
     /**
      * 性名
      */

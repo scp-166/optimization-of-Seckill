@@ -6,10 +6,7 @@ import com.nekosighed.miaosha.error.BusinessException;
 import com.nekosighed.miaosha.pojo.OrderInfoDO;
 import com.nekosighed.miaosha.service.OrderInfoService;
 import com.nekosighed.miaosha.service.UserInfoService;
-import com.nekosighed.miaosha.service.model.ItemInfoModel;
-import com.nekosighed.miaosha.service.model.OrderInfoModel;
-import com.nekosighed.miaosha.service.model.SequenceInfoModel;
-import com.nekosighed.miaosha.service.model.UserInfoModel;
+import com.nekosighed.miaosha.service.model.*;
 import com.nekosighed.miaosha.utils.FillDataUtils;
 import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.springframework.stereotype.Service;
@@ -39,11 +36,14 @@ public class OrderInfoServiceImpl implements OrderInfoService {
     @Resource
     private SequenceInfoServiceImpl sequenceInfoService;
 
+    @Resource
+    private PromoInfoServiceImpl promoInfoService;
+
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Override
-    public OrderInfoModel createOrder(Integer userId, Integer itemId, Integer itemAccount) {
-        // 校验参数，以及校验 用户是否合法， 商品是否存在， 购买数量是否足够
+    public OrderInfoModel createOrder(Integer userId, Integer itemId, Integer promoId, Integer itemAccount) {
+        // 校验参数，以及校验 用户是否合法， 商品是否存在， 购买数量是否足够, 是否处于活动状态
         ItemInfoModel itemInfoModel = itemInfoService.getItemInfoById(itemId);
         if (Objects.isNull(itemInfoModel)) {
             throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR, "商品信息不存在");
@@ -55,6 +55,25 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         if (itemAccount <= 0 || itemAccount > 99) {
             throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR, "购买属性范围不正确");
         }
+        // 校验活动状态
+        if (Objects.nonNull(promoId)) {
+            // 活动是否存在
+            PromoInfoModel promoInfoModel = promoInfoService.getPromoInfoById(promoId);
+            if (Objects.isNull(promoInfoModel)) {
+                throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR, "活动不存在");
+            }
+            // 活动是否符合本商品id
+            if (!promoInfoModel.getId().equals(itemInfoModel.getPromoInfoModel().getId())) {
+                throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR, "活动不匹配");
+            }
+            // 校验活动是否进行中
+            if (itemInfoModel.getPromoInfoModel().getIndStatus() == 2){
+                throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR, "活动已经结束");
+            }
+
+            // 设置活动价格
+            itemInfoModel.setPrice(promoInfoModel.getPromoPrice());
+        }
         // 落单减库存
         if (!itemStockService.decStockAccount(itemId, itemAccount)) {
             throw new BusinessException(BusinessErrorEnum.ITEM_STOCK_NOT_ENOUGH);
@@ -65,6 +84,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         orderInfoModel.setItemId(itemInfoModel.getId());
         orderInfoModel.setUserId(userInfoModel.getId());
         orderInfoModel.setItemAccount(itemAccount);
+        // 平销价格或者活动价格在前面已经设置过了
         orderInfoModel.setItemPrice(itemInfoModel.getPrice());
         orderInfoModel.setOrderPrice(itemInfoModel.getPrice().multiply(BigDecimal.valueOf(itemAccount)));
         // 生成交易流水号
@@ -78,7 +98,7 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         orderInfoDOMapper.insertSelective(orderInfoDO);
 
         // 减少商品销量
-        if (!itemInfoService.incSalesByPrimaryId(itemInfoModel.getId(), itemAccount)){
+        if (!itemInfoService.incSalesByPrimaryId(itemInfoModel.getId(), itemAccount)) {
             throw new BusinessException(BusinessErrorEnum.INC_ITEM_SALES_ERROR);
         }
 
@@ -102,12 +122,12 @@ public class OrderInfoServiceImpl implements OrderInfoService {
         SequenceInfoModel sequenceInfoModel = sequenceInfoService.getSequenceInfoByTableInfo("order_info");
         int sequence = sequenceInfoModel.getCurrentStep();
         sequenceInfoModel.setCurrentStep(sequenceInfoModel.getCurrentStep() + sequenceInfoModel.getStep());
-        if(!sequenceInfoService.updateByTableName(sequenceInfoModel)){
+        if (!sequenceInfoService.updateByTableName(sequenceInfoModel)) {
             System.out.println("订单编号更新失败");
         }
         // 拼接零
         String incrementId = String.valueOf(sequence);
-        for (int i=0; i<6-incrementId.length(); i++){
+        for (int i = 0; i < 6 - incrementId.length(); i++) {
             builder.append("0");
         }
         // 然后才拼接id
