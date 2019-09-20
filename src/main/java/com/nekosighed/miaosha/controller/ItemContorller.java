@@ -61,13 +61,12 @@ public class ItemContorller  {
      */
     @GetMapping(value = "getAll")
     public CommonReturnType getAllItem() {
-        throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR);
-//        List<ItemInfoModel> itemInfoModels = itemInfoService.getItemInfoList();
-//        return CommonReturnType.success(
-//                itemInfoModels.stream().map(itemInfoModel -> {
-//                    return FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
-//                }).collect(Collectors.toList())
-//        );
+        List<ItemInfoModel> itemInfoModels = itemInfoService.getItemInfoList();
+        return CommonReturnType.success(
+                itemInfoModels.stream().map(itemInfoModel -> {
+                    return FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
+                }).collect(Collectors.toList())
+        );
     }
 
     private static class FillData {

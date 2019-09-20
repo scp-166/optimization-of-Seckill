@@ -7,6 +7,7 @@
     <groupId>com.nekosighed</groupId>
     <artifactId>miaosha</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <!-- Inherit defaults from Spring Boot -->
     <parent>
@@ -62,13 +63,22 @@
 
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <!-- 插件 -->
-<!--                <plugin>-->
-<!--                </plugin>-->
-            </plugins>
-        </pluginManagement>
+        <plugins>
+            <!-- 指定 maven 的默认编译jdk版本 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <!--      springboot的打包          -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
