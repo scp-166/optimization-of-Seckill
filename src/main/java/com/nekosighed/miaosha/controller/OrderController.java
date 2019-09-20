@@ -15,7 +15,7 @@ import java.util.Objects;
 @RestController
 @CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/order")
-public class OrderController extends BaseController {
+public class OrderController {
     @Resource
     private HttpServletRequest httpServletRequest;
 

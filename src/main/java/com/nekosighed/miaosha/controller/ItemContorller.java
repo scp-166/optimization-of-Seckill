@@ -1,6 +1,8 @@
 package com.nekosighed.miaosha.controller;
 
 import com.nekosighed.miaosha.controller.viewobject.ItemInfoVO;
+import com.nekosighed.miaosha.error.BusinessErrorEnum;
+import com.nekosighed.miaosha.error.BusinessException;
 import com.nekosighed.miaosha.response.CommonReturnType;
 import com.nekosighed.miaosha.service.impl.ItemInfoServiceImpl;
 import com.nekosighed.miaosha.service.model.ItemInfoModel;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @Validated
 @CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/item")
-public class ItemContorller extends BaseController {
+public class ItemContorller  {
     @Resource
     private ItemInfoServiceImpl itemInfoService;
 
@@ -59,12 +61,13 @@ public class ItemContorller extends BaseController {
      */
     @GetMapping(value = "getAll")
     public CommonReturnType getAllItem() {
-        List<ItemInfoModel> itemInfoModels = itemInfoService.getItemInfoList();
-        return CommonReturnType.success(
-                itemInfoModels.stream().map(itemInfoModel -> {
-                    return FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
-                }).collect(Collectors.toList())
-        );
+        throw new BusinessException(BusinessErrorEnum.PARAM_VALIDATE_ERROR);
+//        List<ItemInfoModel> itemInfoModels = itemInfoService.getItemInfoList();
+//        return CommonReturnType.success(
+//                itemInfoModels.stream().map(itemInfoModel -> {
+//                    return FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
+//                }).collect(Collectors.toList())
+//        );
     }
 
     private static class FillData {

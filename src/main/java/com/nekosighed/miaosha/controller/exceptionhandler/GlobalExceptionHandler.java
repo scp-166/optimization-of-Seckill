@@ -1,4 +1,4 @@
-package com.nekosighed.miaosha.controller;
+package com.nekosighed.miaosha.controller.exceptionhandler;
 
 import com.nekosighed.miaosha.error.BusinessErrorEnum;
 import com.nekosighed.miaosha.error.BusinessException;
@@ -6,19 +6,21 @@ import com.nekosighed.miaosha.response.CommonReturnType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import sun.misc.BASE64Encoder;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseController {
-    private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * 捕获到 Exception
@@ -29,14 +31,19 @@ public class BaseController {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
-    public CommonReturnType getException(HttpServletRequest request, Exception ex) {
-        logger.error(ex.toString());
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK) // 指定返回状态码为 200
+    public CommonReturnType getException(HttpServletRequest request, HttpServletResponse response, Exception ex) {
+        logger.warn(ex.toString());
         Map<String, Object> errData;
         // 如果是属于业务异常， 封装业务异常的内容
         if (ex instanceof BusinessException) {
             BusinessException businessException = (BusinessException) ex;
             errData = fillResponse(businessException.getCode(), businessException.getMsg());
+        } else if (ex instanceof ServletRequestBindingException) {
+            errData = fillResponse(BusinessErrorEnum.UNKNOWN_ERROR.getCode(), "url绑定访问方法错误");
+        } else if (ex instanceof NoHandlerFoundException) {
+            errData = fillResponse(BusinessErrorEnum.UNKNOWN_ERROR.getCode(), "没有找到对应的访问路径");
         } else {
             // 否则封装为未知错误异常
             errData = fillResponse(BusinessErrorEnum.UNKNOWN_ERROR.getCode(),
@@ -60,6 +67,4 @@ public class BaseController {
             }
         };
     }
-
-
 }
