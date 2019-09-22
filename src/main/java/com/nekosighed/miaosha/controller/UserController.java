@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
@@ -109,13 +110,10 @@ public class UserController {
             e.printStackTrace();
             throw new BusinessException(BusinessErrorEnum.UNKNOWN_ERROR, "密码解析错误");
         }
-        redisUtils.set("IS_LOGIN" + ":" + telphone, 1);
-        redisUtils.set("LOGIN_USER" + ":" + telphone, userInfoModel);
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        redisUtils.set(uuid, userInfoModel, 600);
 
-        httpServletRequest.getSession().setAttribute("IS_LOGIN", true);
-        httpServletRequest.getSession().setAttribute("LOGIN_USER", userInfoModel);
-
-        return CommonReturnType.success("登陆成功");
+        return CommonReturnType.success(uuid);
     }
 
     @GetMapping("/user")

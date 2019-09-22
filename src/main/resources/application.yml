@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8080
 
 mybatis:
   # mybatis xml 文件存放位置
@@ -16,6 +16,15 @@ spring:
     # druid 数据源
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
+    druid:
+      #配置初始化连接数大小
+      initial-size: 10
+      # 最大连接数
+      max-active: 50
+      #最小连接数
+      min-idle: 10
+      #获取连接等待超时时间
+      max-wait: 5000
 
   # 下面两个配置是为了handlerException可以捕获404
   mvc:
@@ -28,7 +37,7 @@ spring:
     add-mappings: false
 
   redis:
-    host: 127.0.0.1
+    host: 119.23.28.95
     port: 6379
     password:
     jedis:

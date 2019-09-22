@@ -21,6 +21,7 @@ public enum BusinessErrorEnum implements CommonError{
     OPT_AUTH_ERROR(20004, "短信验证失败"),
     USER_NOT_LOGIN(20005, "用户未登陆"),
     SAVE_PASSWORD_ERROR(20006, "保存密码失败"),
+    LACK_FOR_TOKEN(20007, "缺失token"),
 
     ITEM_SAVE_ERROR(30001, "商品保存失败"),
     ITEM_STOCK_SAVE_ERROR(30002, "商品库存保存失败"),

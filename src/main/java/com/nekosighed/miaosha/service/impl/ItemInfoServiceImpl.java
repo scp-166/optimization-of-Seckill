@@ -98,6 +98,7 @@ public class ItemInfoServiceImpl implements ItemInfoService {
         if (Objects.nonNull(promoInfoModel)){
             itemInfoModel.setPromoInfoModel(promoInfoModel);
         }
+        itemInfoModel.setIndPromoId(promoInfoModel.getId());
         return itemInfoModel;
     }
 

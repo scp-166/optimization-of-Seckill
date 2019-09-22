@@ -4,9 +4,11 @@ import com.nekosighed.miaosha.controller.viewobject.ItemInfoVO;
 import com.nekosighed.miaosha.error.BusinessErrorEnum;
 import com.nekosighed.miaosha.error.BusinessException;
 import com.nekosighed.miaosha.response.CommonReturnType;
+import com.nekosighed.miaosha.service.impl.CacheServiceImpl;
 import com.nekosighed.miaosha.service.impl.ItemInfoServiceImpl;
 import com.nekosighed.miaosha.service.model.ItemInfoModel;
 import com.nekosighed.miaosha.utils.FillDataUtils;
+import com.nekosighed.miaosha.utils.RedisUtils;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -23,9 +25,15 @@ import java.util.stream.Collectors;
 @Validated
 @CrossOrigin(allowedHeaders = "*", allowCredentials = "true")
 @RequestMapping("/item")
-public class ItemContorller  {
+public class ItemContorller {
     @Resource
     private ItemInfoServiceImpl itemInfoService;
+
+    @Resource
+    private RedisUtils redisUtils;
+
+    @Resource
+    private CacheServiceImpl cacheService;
 
     /**
      * 创建一条商品信息
@@ -48,7 +56,18 @@ public class ItemContorller  {
      */
     @GetMapping(value = "/get")
     public CommonReturnType getItem(@RequestParam Integer itemId) {
-        ItemInfoModel itemInfoModel = itemInfoService.getItemInfoById(itemId);
+        ItemInfoModel itemInfoModel = (ItemInfoModel) cacheService.getCommonCache("item_" + itemId);
+        if (Objects.isNull(itemInfoModel)) {
+            itemInfoModel = (ItemInfoModel) redisUtils.get("item_" + itemId);
+            if (Objects.isNull(itemInfoModel)) {
+                itemInfoModel = itemInfoService.getItemInfoById(itemId);
+                // 设置 redis 缓存
+                redisUtils.set("item_" + itemId, itemInfoModel, 600);
+            }
+            // 设置本地缓存
+            cacheService.setCommonCache("item_" + itemId, itemInfoModel);
+        }
+
         ItemInfoVO itemInfoVO = FillDataUtils.fillModelToVo(itemInfoModel, ItemInfoVO.class);
         itemInfoVO = FillData.advanceData(itemInfoVO, itemInfoModel);
         return CommonReturnType.success(itemInfoVO);

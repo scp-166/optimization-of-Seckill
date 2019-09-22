@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK) // 指定返回状态码为 200
     public CommonReturnType getException(HttpServletRequest request, HttpServletResponse response, Exception ex) {
-        logger.warn(ex.toString());
+        ex.printStackTrace();
         Map<String, Object> errData;
         // 如果是属于业务异常， 封装业务异常的内容
         if (ex instanceof BusinessException) {

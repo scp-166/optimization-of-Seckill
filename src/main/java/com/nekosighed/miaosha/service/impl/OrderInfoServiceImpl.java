@@ -8,7 +8,6 @@ import com.nekosighed.miaosha.service.OrderInfoService;
 import com.nekosighed.miaosha.service.UserInfoService;
 import com.nekosighed.miaosha.service.model.*;
 import com.nekosighed.miaosha.utils.FillDataUtils;
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

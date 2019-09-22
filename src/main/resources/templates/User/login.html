@@ -7,6 +7,7 @@
     <script type="application/javascript" src="../../static/js/vue.js"></script>
     <script src="https://cdn.staticfile.org/axios/0.18.0/axios.min.js"></script>
     <script src="../../static/component/utils.js"></script>
+    <script src="../../static/js/g_host.js"></script>
 
 
 </head>
@@ -53,7 +54,7 @@
                 let that = this;
                 let instance = window.utils.getInstance();
                 instance({
-                    url: "http://127.0.0.1:8080/login",
+                    url: "http://" + g_host + "/login",
                     method: "post",
                     data: formData,
                     // 允许在向服务器发送请求前，修改请求数据，只能用在 put post patch
@@ -75,6 +76,7 @@
                     if (data.status === "success") {
                         that.info = "登陆成功";
                         that.isShow = false;
+                        window.localStorage["token"] =  data.data;
                         window.location.href = "http://localhost:63342/miaosha/templates/Item/itemList.html"
                     }
                     if (data.status === "fail") {

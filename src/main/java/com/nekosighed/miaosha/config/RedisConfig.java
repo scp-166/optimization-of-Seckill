@@ -2,6 +2,10 @@ package com.nekosighed.miaosha.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.nekosighed.miaosha.serializer.JodaTimeDeserializer;
+import com.nekosighed.miaosha.serializer.JodaTimeSerializer;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +28,8 @@ public class RedisConfig{
     Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
     /**
-     * 方法名一定要叫redisTemplate 因为@Bean注解是根据方法名配置这个bean的name的，覆盖默认配置
+     * 当 spring 容器中不存在 redisTemplate 的bean 时候，会自动加载默认的实现
+     * 这里新建一个同名 bean 来覆盖 redisTemplate
      * @param factory
      * @return
      */
@@ -33,22 +38,29 @@ public class RedisConfig{
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
 
+        // 解决 key 的序列化方式
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        // key采用String的序列化方式
         template.setKeySerializer(stringRedisSerializer);
-        // hash的key也采用String的序列化方式
         template.setHashKeySerializer(stringRedisSerializer);
-        // value序列化方式采用jackson
+
+        // 解决 value 的序列化方式
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        //
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        // 自动加载类名
+        objectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        // 加载自定义序列化器
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(DateTime.class, new JodaTimeSerializer());
+        simpleModule.addDeserializer(DateTime.class, new JodaTimeDeserializer());
+        objectMapper.registerModule(simpleModule);
+        // 将上面的序列化方式加载进来
+        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+
         template.setValueSerializer(jackson2JsonRedisSerializer);
-        // hash的value序列化方式采用jackson
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        template.afterPropertiesSet();
 
         return template;
     }
