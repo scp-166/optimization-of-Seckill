@@ -48,3 +48,9 @@ spring:
         min-idle: 0  # 连接池中的最小空闲连接
     timeout: 200  # 连接超时时间（ms)
     database: 0
+
+
+rocketmq:
+  nameserver:
+    addr: 119.23.28.95:9876  # 指定 nameserver 的 地址和端口
+  topicname: stock  # 指定 topic 名称
